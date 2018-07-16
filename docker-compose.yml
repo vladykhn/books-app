@@ -1,0 +1,35 @@
+version: '3'
+services:
+  backend: # Node.js Backend App
+    container_name: backend
+    build: ./backend/
+    ports:
+      - "9229:9229" # Expose Node process debug port (disable in production)
+      - "3000:3000"
+    environment: # Set ENV vars
+      - DEBUG=*
+      - PORT=3000
+      - POSTGRES_PORT=5432
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_USER=docker
+      - POSTGRES_DB=docker
+      - POSTGRES_HOST=db
+    depends_on:
+      - db
+  # frontend: # Nginx Server For Frontend App
+  #   container_name: frontend
+  #   image: nginx
+  #   volumes: # Serve local dist dir
+  #     - ./frontend/dist:/usr/share/nginx/html
+  #   ports:
+  #     - "8080:80" # Forward site to localhost:8080
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_USER=docker
+      - POSTGRES_DB=docker
+    volumes:
+      - ./books.sql:/docker-entrypoint-initdb.d/books.sql
+    ports:
+      - "5432:5432"
