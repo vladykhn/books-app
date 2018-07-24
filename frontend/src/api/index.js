@@ -8,40 +8,33 @@ const request = axios.create({
 })
 
 async function addBook (bookData) {
-  const response = await request.post('/', bookData)
-  const newBook = response.data
-  return newBook
+  const { data } = await request.post('/', bookData)
+  return data
 }
 
 async function updateBook (id, bookData) {
-  const response = await request.put(`/${id}`, bookData)
-  const updatedBook = response.data
-  return updatedBook
+  const { data } = await request.put(`/${id}`, bookData)
+  return data
 }
 
-async function getBooks (offset) {
-  if (!offset) {
-    offset = 0
-  }
+async function getBooks (offset = 0) {
   const response = await request.get('/', {
     params: {
       offset
     }
   })
-  const allBooks = response.data.data
-  return allBooks
+  const { data: { data = [] } } = response
+  return data
 }
 
 async function getSingleBook (id) {
-  const response = await request.get(`/${id}`)
-  const singleBook = response.data
-  return singleBook
+  const { data } = await request.get(`/${id}`)
+  return data
 }
 
 async function getRandomBook (id) {
-  const response = await request.get(`/random`)
-  const singleBook = response.data
-  return singleBook
+  const { data } = await request.get(`/random`)
+  return data
 }
 
 export default {

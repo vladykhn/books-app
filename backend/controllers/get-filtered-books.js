@@ -1,5 +1,4 @@
-const db = require('../db');
-const { logger, validateFilter, formatDate } = require('../utils');
+const { validateFilter, formatDate } = require('../utils');
 
 function buildFilterQuery(params) {
   const filterQuery = [];
@@ -50,43 +49,27 @@ function buildFilterQuery(params) {
 }
 
 async function getFilteredBooks(ctx) {
-  try {
-    const { error, value } = validateFilter(ctx.request.query);
-    if (error) {
-      ctx.status = 400;
-      ctx.body = {
-        status: 'error',
-        data: 'Your params is invalid',
-        error,
-      };
-      return;
-    }
-    const { query, filterArgs } = buildFilterQuery(value);
-    const { rows } = await db.query(query, filterArgs);
-
-    if (!rows || !rows[0]) {
-      ctx.status = 204;
-      ctx.body = {
-        status: 'success',
-        data: 'Sorry, we have nothing',
-      };
-      return;
-    }
-
-    const books = rows;
-    ctx.status = 200;
-    ctx.body = {
-      status: 'success',
-      data: books,
-    };
-  } catch (error) {
-    logger.error(error);
-    ctx.status = 500;
-    ctx.body = {
-      status: 'error',
-      data: 'We can not get any books for you. DB problem',
-    };
+  const httpError = new Error();
+  const { error, value } = validateFilter(ctx.request.query);
+  if (error) {
+    httpError.status = 400;
+    httpError.message = 'Your params is invalid';
+    httpError.data = error;
+    throw httpError;
   }
+  const { query, filterArgs } = buildFilterQuery(value);
+  const { rows } = await ctx.db.query(query, filterArgs);
+
+  if (!Array.isArray(rows)) {
+    httpError.status = 204;
+    httpError.message = 'Sorry, we have nothing';
+    throw httpError;
+  }
+  ctx.status = 200;
+  ctx.body = {
+    status: 'success',
+    data: rows,
+  };
 }
 
 module.exports = { getFilteredBooks };

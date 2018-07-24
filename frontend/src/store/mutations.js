@@ -1,6 +1,6 @@
 export default {
   setBooks (state, newBooks) {
-    state.books = state.books.concat(newBooks)
+    state.books = [...state.books, ...newBooks]
   },
   setStatus (state, newStatus) {
     state.status = newStatus

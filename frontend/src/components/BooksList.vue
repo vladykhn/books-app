@@ -29,7 +29,9 @@ export default {
     ]),
     scroll () {
       window.onscroll = () => {
-        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+        let bottomOfWindow = document.documentElement.scrollTop + 
+          window.innerHeight === document.documentElement.offsetHeight
+
         if (bottomOfWindow) {
           this.getMoreBooks(this.currentOffset)
         }
